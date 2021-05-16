@@ -1,0 +1,96 @@
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+Task was destroyed but it is pending!
+task: <Task pending name='Task-390' coro=<Event.wait() done, defined at /Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/asyncio/locks.py:213> wait_for=<Future pending cb=[<TaskWakeupMethWrapper object at 0x7ff0d80b6dc0>()]>>
+Task was destroyed but it is pending!
+task: <Task pending name='Task-391' coro=<Event.wait() done, defined at /Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/asyncio/locks.py:213> wait_for=<Future pending cb=[<TaskWakeupMethWrapper object at 0x7ff149506490>()]>>
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+Task was destroyed but it is pending!
+task: <Task pending name='Task-445' coro=<Event.wait() running at /Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/asyncio/locks.py:226> wait_for=<Future pending cb=[<TaskWakeupMethWrapper object at 0x7ff14957e640>()]>>
+Task was destroyed but it is pending!
+task: <Task pending name='Task-446' coro=<Event.wait() running at /Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/asyncio/locks.py:226> wait_for=<Future pending cb=[<TaskWakeupMethWrapper object at 0x7ff0d80318e0>()]>>
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+websocket connection is closing.
+Ignoring exception in on_voice_state_update
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/discord/client.py", line 343, in _run_event
+    await coro(*args, **kwargs)
+  File "/Users/rohitpenta/Documents/GitHub/TutorVC/cogs/vcUpdate.py", line 145, in on_voice_state_update
+    voice_client.play(audio_source)
+AttributeError: 'NoneType' object has no attribute 'play'
+Ignoring exception in command None:
+discord.ext.commands.errors.CommandNotFound: Command "eval" is not found
+Ignoring exception in command None:
+discord.ext.commands.errors.CommandNotFound: Command "eval" is not found
+Ignoring exception in command None:
+discord.ext.commands.errors.CommandNotFound: Command "eval" is not found
+1.7.1
+Current Time = 2021-05-15 18:50:50.791867
+[93mLoading audio files...[0m
+[92mmasaAudio.mp3 - 100% | Status: LOADED[0m
+[92mstartCH.mp3 - 100% | Status: LOADED[0m
+[94mCONNECTED TO DISCORD[0m
+843256683525701682
+843256683525701682
+masa is short
+1.7.1
+Current Time = 2021-05-15 19:38:49.278950
+[93mLoading audio files...[0m
+[92mmasaAudio.mp3 - 100% | Status: LOADED[0m
+[92mstartCH.mp3 - 100% | Status: LOADED[0m
+[94mCONNECTED TO DISCORD[0m
+1.7.1
+Current Time = 2021-05-15 19:45:14.295865
+[93mLoading audio files...[0m
+[92mmasaAudio.mp3 - 100% | Status: LOADED[0m
+[92mstartCH.mp3 - 100% | Status: LOADED[0m
+[94mCONNECTED TO DISCORD[0m
+1.7.1
+Current Time = 2021-05-15 20:05:05.951839
+[93mLoading audio files...[0m
+[92mmasaAudio.mp3 - 100% | Status: LOADED[0m
+[92mstartCH.mp3 - 100% | Status: LOADED[0m
+[94mCONNECTED TO DISCORD[0m
+1.7.1
+Current Time = 2021-05-15 21:17:53.700305
+[93mLoading audio files...[0m
+[92mmasaAudio.mp3 - 100% | Status: LOADED[0m
+[92mstartCH.mp3 - 100% | Status: LOADED[0m
+[94mCONNECTED TO DISCORD[0m
