@@ -11,6 +11,9 @@ import aiohttp
 import discord
 from discord.ext import commands
 import chat_exporter
+from dotenv import load_dotenv
+
+load_dotenv()
 
 #Applying towards intents
 intents = discord.Intents.default()  
@@ -64,13 +67,13 @@ async def on_ready():
 
     print(f"{bcolors.OKBLUE}CONNECTED TO DISCORD{bcolors.ENDC}")
     chat_exporter.init_exporter(client)
-    guild = await client.fetch_guild(783914689847361537)
+    guild = await client.fetch_guild(763119924385939498)
     #botVoiceState = guild.get_member(842468709406081034)
 
     voice = discord.utils.get(client.voice_clients, guild=guild)
 
     if voice == None:
-        voiceChannel = await client.fetch_channel(842587545070206976)
+        voiceChannel = await client.fetch_channel(784556875487248394)
 
         global vc
         vc = await voiceChannel.connect()
@@ -162,6 +165,6 @@ async def ping(ctx):
     await ctx.send(embed=pingembed)
 
 
-client.run("token")
+client.run(os.getenv("TOKEN"))
 
 

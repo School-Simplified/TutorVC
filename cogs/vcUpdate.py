@@ -1,4 +1,3 @@
-from typing import final
 from discord.ext import commands, tasks
 import discord
 import logging
@@ -11,11 +10,11 @@ import asyncio
 #from main import vc
 
 #Variables
-channel_id = 842587545070206976
-categoryID = 842587321944637451
+channel_id = 843637802293788692
+categoryID = 776988961087422515
 
-staticChannels = [842587545070206976, 842587574123495464]
-presetChannels = [842587512710234122, 842587545070206976, 842587574123495464]
+staticChannels = [784556875487248394, 784556893799448626]
+presetChannels = [843637802293788692, 784556875487248394, 784556893799448626]
 time_convert = {"s": 1, "m": 60, "h": 3600, "d": 86400}
 
 
@@ -61,11 +60,10 @@ class SkeletonCMD(commands.Cog):
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
         database.db.connect(reuse_if_open=True)
-        lobbyStart = await self.bot.fetch_channel(842587545070206976)
+        lobbyStart = await self.bot.fetch_channel(784556875487248394)
 
         if after.channel == None and not member.bot:
-            acadChannel = await self.bot.fetch_channel(842587512710234122)
-            timestamp2 = datetime.now()
+            acadChannel = await self.bot.fetch_channel(channel_id)
             team = discord.utils.get(member.guild.roles, name='Academics Team')
             query = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == member.id) & (database.VCChannelInfo.used == True))
 
@@ -98,12 +96,13 @@ class SkeletonCMD(commands.Cog):
                             await before.channel.delete()
                         except Exception as e:
                             print(f"Error Deleting Channel:\n{e}")
+                        else:
+                            embed = discord.Embed(title = f"{member.display_name} Total Voice Minutes", description = f"{member.mention} you have spent a total of `{day} minutes` in voice channel, **{query.name}**.", color = discord.Colour.gold())
+                            embed.set_footer(text = "The voice channel has been deleted!")
+                            await acadChannel.send(content = member.mention, embed = embed) 
                         finally:
                             query.delete_instance() 
-
-                        embed = discord.Embed(title = f"{member.display_name} Total Voice Minutes", description = f"{member.mention} you have spent a total of `{day} minutes` in voice channel, **{query.name}**.", color = discord.Colour.gold())
-                        embed.set_footer(text = "The voice channel has been deleted!")
-                        await acadChannel.send(content = member.mention, embed = embed) 
+                        
 
                 else:
                     print("no")
@@ -114,10 +113,10 @@ class SkeletonCMD(commands.Cog):
 
         elif after.channel != None and after.channel == lobbyStart and not member.bot:
             team = discord.utils.get(member.guild.roles, name='Academics Team')
-            acadChannel = await self.bot.fetch_channel(842587512710234122)
+            acadChannel = await self.bot.fetch_channel(channel_id)
 
             if team in member.roles:
-                category = discord.utils.get(member.guild.categories, name= "VC Test")
+                category = discord.utils.get(member.guild.categories, id = categoryID)
 
                 if len(category.voice_channels) >= 12:
                     embed = discord.Embed(title = "Max Channel Allowance", description = "I'm sorry! This category has reached its full capacity at **12** voice channels!\n\n**Please wait until a tutoring session ends before creating a new voice channel!**", color = discord.Colour.red())
@@ -160,6 +159,7 @@ class SkeletonCMD(commands.Cog):
             else:
                 voice_client: discord.VoiceClient = discord.utils.get(self.bot.voice_clients, guild= member.guild)
                 audio_source = discord.FFmpegPCMAudio('no.mp3')
+                await asyncio.sleep(1)
 
                 voice_client.play(audio_source)
                 await asyncio.sleep(2)
@@ -279,57 +279,53 @@ class SkeletonCMD(commands.Cog):
         database.db.close()
 
     @commands.command()
+    @commands.has_role(784202171825913856) #Acad Manager
     async def forceend(self, ctx, channel: discord.VoiceChannel):
         database.db.connect(reuse_if_open=True)
-        team = discord.utils.get(ctx.guild.roles, name='Academics Team')
+        team = discord.utils.get(ctx.guild.roles, name='Academics Manager')
         member = ctx.guild.get_member(ctx.author.id)
         timestamp2 = datetime.now()
 
-        voice_state = member.voice
+        #voice_state = member.voice
 
         if team in ctx.author.roles:
-            if voice_state == None:
-                embed = discord.Embed(title = "Unknown Voice Channel", description = "You have to be in a voice channel you own in order to use this!", color = discord.Colour.dark_red())
+            if channel.id in presetChannels:
+                embed = discord.Embed(title = "UnAuthorized Channel Deletion", description = "You are not allowed to delete these channels!\n\n**Error Detection:**\n**1)** Detected Static Channels", color = discord.Colour.dark_red())
                 return await ctx.send(embed = embed)
 
-            else:
-                if voice_state.channel.id in presetChannels:
-                    embed = discord.Embed(title = "UnAuthorized Channel Deletion", description = "You are not allowed to delete these channels!\n\n**Error Detection:**\n**1)** Detected Static Channels", color = discord.Colour.dark_red())
-                    return await ctx.send(embed = embed)
+            if channel.category_id == categoryID:
+                query = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == channel.id))
 
-                if member.voice.channel.category_id == categoryID:
-                    query = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == channel.id))
+                if query.exists():
+                    q: database.VCChannelInfo = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == channel.id)).get()
 
-                    if query.exists():
-                        q: database.VCChannelInfo = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == channel.id)).get()
-
-                        day = showTotalMinutes(q.datetimeObj)
+                    day = showTotalMinutes(q.datetimeObj)
 
 
-                        for VCMember in channel.members:
-                            if team in VCMember.roles:
-                                tag: database.IgnoreThis = database.IgnoreThis.create(channelID = voice_state.channel.id, authorID = VCMember.id)
-                                tag.save()
-                                print(f"Added: {VCMember.id}")
-                                
-                        
-                        await channel.delete()
-                        embed = discord.Embed(title = "Ended Session", description = "I have successfully ended the session!", color = discord.Colour.blue())
-                        embed.add_field(name = "Time Spent", value = f"{member.mention} you have spent a total of `{day} minutes` in voice channel, **{q.name}**.")
-                        await ctx.send(embed = embed)
-
-                        q.delete_instance()
-
-                    else:
-                        await channel.delete()
-                        embed = discord.Embed(title = "Partial Completion", description = f"The database indicates there is no owner or data related to this voice channel but I have still deleted the channel!", color = discord.Colour.gold())
+                    for VCMember in channel.members:
+                        if team in VCMember.roles:
+                            tag: database.IgnoreThis = database.IgnoreThis.create(channelID = channel.id, authorID = VCMember.id)
+                            tag.save()
+                            print(f"Added: {VCMember.id}")
                             
-                        await ctx.send(embed = embed)
-                        
-                else:
-                    embed = discord.Embed(title = "Unknown Channel", description = f"You are not the owner of this voice channel nor is this a valid channel. Please execute the command under a channel you own!", color = discord.Colour.red())
-                            
+                    
+                    await channel.delete()
+                    embed = discord.Embed(title = "Ended Session", description = "I have successfully ended the session!", color = discord.Colour.blue())
+                    embed.add_field(name = "Time Spent", value = f"{member.mention} you have spent a total of `{day} minutes` in voice channel, **{q.name}**.")
                     await ctx.send(embed = embed)
+
+                    q.delete_instance()
+
+                else:
+                    await channel.delete()
+                    embed = discord.Embed(title = "Partial Completion", description = f"The database indicates there is no owner or data related to this voice channel but I have still deleted the channel!", color = discord.Colour.gold())
+                        
+                    await ctx.send(embed = embed)
+                    
+            else:
+                embed = discord.Embed(title = "Unknown Channel", description = f"You are not the owner of this voice channel nor is this a valid channel. Please execute the command under a tutoring channel!", color = discord.Colour.red())
+                        
+                await ctx.send(embed = embed)
         database.db.close()
 
     @commands.command()
