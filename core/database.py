@@ -10,8 +10,13 @@ from datetime import datetime
 from peewee import MySQLDatabase
 from playhouse.shortcuts import ReconnectMixin
 from flask import Flask
+from dotenv import load_dotenv
 
-db = MySQLDatabase("SchoolSimplified", user="portaladmin", password="portalturtle",host="3.142.255.184", port=3306)
+load_dotenv()
+
+
+db = MySQLDatabase(os.getenv("DatabaseName"), user=os.getenv("Username"), password=os.getenv("Password"),host= os.getenv("IP"), port = int(os.getenv("PORT")))
+
 logger = logging.getLogger(__name__) 
 
 def iter_table(model_dict):
