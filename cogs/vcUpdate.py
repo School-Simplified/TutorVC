@@ -65,17 +65,17 @@ class SkeletonCMD(commands.Cog):
         if after.channel == None and not member.bot:
             acadChannel = await self.bot.fetch_channel(channel_id)
             team = discord.utils.get(member.guild.roles, name='Academics Team')
-            query = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == member.id) & (database.VCChannelInfo.used == True))
+            query = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == member.id) & (database.VCChannelInfo.ChannelID == before.channel.id))
 
             ignoreQuery = database.IgnoreThis.select().where((database.IgnoreThis.authorID == member.id) & (database.IgnoreThis.channelID == before.channel.id))
 
             if ignoreQuery.exists():
-                iq: database.IgnoreThis =  database.IgnoreThis.select().where((database.IgnoreThis.authorID == member.id) & (database.IgnoreThis.channelID == before.channel.id)).get()
+                iq: database.IgnoreThis = database.IgnoreThis.select().where((database.IgnoreThis.authorID == member.id) & (database.IgnoreThis.channelID == before.channel.id)).get()
                 iq.delete_instance()
                 return print("Ignore Channel")
 
             if query.exists() and team in member.roles and before.channel.category.id == categoryID:
-                query = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == member.id) & (database.VCChannelInfo.used == True)).get()
+                query = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == member.id) & (database.VCChannelInfo.ChannelID == before.channel.id)).get()
 
                 print(query.ChannelID)
                 print(before.channel.id)
