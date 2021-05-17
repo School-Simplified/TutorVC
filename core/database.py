@@ -34,7 +34,7 @@ class VCChannelInfo(BaseModel):
     ChannelID = TextField()
     name = TextField()
     authorID = TextField()
-    datetimeObj = DateTimeField(default = datetime.now())
+    datetimeObj = DateTimeField()
     used = BooleanField()
 
 class NameAva(BaseModel):
