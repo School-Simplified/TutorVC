@@ -61,11 +61,12 @@ class SkeletonCMD(commands.Cog):
     async def rename(self, ctx, *, name = None):
         database.db.connect(reuse_if_open=True)
         team = discord.utils.get(ctx.guild.roles, name='Academics Team')
+        dj = discord.utils.get(ctx.guild.roles, name='DJ')
         member = ctx.guild.get_member(ctx.author.id)
 
         voice_state = member.voice
 
-        if team in ctx.author.roles:
+        if (team in ctx.author.roles or dj in ctx.author.roles):
             if voice_state == None:
                 await ctx.send("You need to be in a voice channel you own to use this!")
 
