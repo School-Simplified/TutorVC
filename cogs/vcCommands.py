@@ -146,7 +146,6 @@ class SkeletonCMD(commands.Cog):
 
                     day = showTotalMinutes(q.datetimeObj)
 
-                    await asyncio.sleep(1)
                     await voice_state.channel.delete()
                     embed = discord.Embed(title = "Ended Session", description = "I have successfully ended the session!", color = discord.Colour.blue())
                     embed.add_field(name = "Time Spent", value = f"{member.mention} you have spent a total of `{day} minutes` in voice channel, **{q.name}**.")
@@ -154,7 +153,6 @@ class SkeletonCMD(commands.Cog):
 
                     q.delete_instance()
 
-                    
 
                 else:
                     try:
