@@ -420,8 +420,8 @@ class SkeletonCMD(commands.Cog):
                     except:
                         return await ctx.send("Not a valid number!")
                     else:
-                        if MT not in ctx.author.roles and MAT not in ctx.author.roles and TT not in ctx.author.roles and AT not in ctx.author.roles and VP not in ctx.author.roles and CO not in ctx.author.roles:
-                            if voiceLIMIT >= 4:
+                        if MT not in ctx.author.roles and MAT not in ctx.author.roles and TT not in ctx.author.roles and AT not in ctx.author.roles and VP not in ctx.author.roles and CO not in ctx.author.roles and ctx.author.id != 682715516456140838:
+                            if voiceLIMIT > 4:
                                 return await ctx.send("You can't increase the voice limit to something bigger then 4 members!")
                             
                             else:
@@ -429,7 +429,7 @@ class SkeletonCMD(commands.Cog):
                                 return await ctx.send("Successfully modified voice limit!")
 
                         else:
-                            if voiceLIMIT >= 10:
+                            if voiceLIMIT > 10:
                                 return await ctx.send("You can't increase the voice limit to something bigger then 10 members!")
                             
                             else:
