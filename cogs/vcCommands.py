@@ -429,7 +429,7 @@ class SkeletonCMD(commands.Cog):
                                 return await ctx.send("Successfully modified voice limit!")
 
                         else:
-                            if voiceLIMIT >= 10:
+                            if voiceLIMIT > 10:
                                 return await ctx.send("You can't increase the voice limit to something bigger then 10 members!")
                             
                             else:
