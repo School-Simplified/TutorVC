@@ -41,16 +41,12 @@ class VCChannelInfo(BaseModel):
     authorID = TextField()
     datetimeObj = DateTimeField()
     used = BooleanField()
-
-class NameAva(BaseModel):
-    id = AutoField()
-    name = TextField()
-    free = BooleanField()
+    lockStatus = BooleanField()
 
 class IgnoreThis(BaseModel):
     id = AutoField()
     channelID = TextField()
-    authorID = BooleanField()
+    authorID = TextField()
 
 app = Flask(__name__)
 
