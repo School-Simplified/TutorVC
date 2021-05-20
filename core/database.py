@@ -41,7 +41,7 @@ class VCChannelInfo(BaseModel):
     authorID = TextField()
     datetimeObj = DateTimeField()
     used = BooleanField()
-    lockStatus = BooleanField()
+    lockStatus = TextField()
 
 class IgnoreThis(BaseModel):
     id = AutoField()
