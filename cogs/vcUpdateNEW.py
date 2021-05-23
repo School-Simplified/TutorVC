@@ -154,7 +154,7 @@ class SkeletonCMD(commands.Cog):
                 def check(m):
                     return m.content is not None and m.channel == acadChannel and m.author is not self.bot.user and m.author == member
 
-                embed = discord.Embed(title = "Tutoring Voice Channel Creation", description = f"Hey there! I see you've attempted to create a voice channel, please remember that if you disconnect from the voice channel. You will have **2** minutes to rejoin in order to prevent losing the channel!\n\n✅ *Created: {member.display_name}'s Tutoring Channel*", color = discord.Colour.green())
+                embed = discord.Embed(title = "Tutoring Voice Channel Creation", description = f"Hey there! I see you've attempted to create a voice channel. Please remember that if you disconnect from the voice channel, you will have **2** minutes to rejoin in order to prevent losing the channel!\n\n✅ *Created: {member.display_name}'s Tutoring Channel*", color = discord.Colour.green())
                 embed.set_footer(text = "If you have any questions, DM or Ping Space!")
 
                 channel = await category.create_voice_channel(f"{member.display_name}'s Tutoring Channel", user_limit = 2)
