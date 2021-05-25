@@ -337,7 +337,7 @@ class SkeletonCMD(commands.Cog):
 
 
     @commands.command()
-    async def permit(self, ctx, type, user: discord.Member):
+    async def permit(self, ctx, typeAction, user: discord.Member):
         database.db.connect(reuse_if_open=True)
         member = ctx.guild.get_member(ctx.author.id)
         timestamp2 = datetime.now()
@@ -364,10 +364,30 @@ class SkeletonCMD(commands.Cog):
                         return await ctx.send(embed = embed)
 
                     else:
-                        await member.voice.channel.set_permissions(user, connect = True)
-                        embed = discord.Embed(title = "Permit Setup", description = f"{user.mention} now has access to this channel!", color = discord.Colour.blurple())
-                        return await ctx.send(embed = embed)
+                        if typeAction == "+" or typeAction.lower() == "add":
+                            await member.voice.channel.set_permissions(user, connect = True)
+                            embed = discord.Embed(title = "Permit Setup", description = f"{user.mention} now has access to this channel!", color = discord.Colour.blurple())
+                            return await ctx.send(embed = embed)
+                            
+                        elif typeAction == "-" or typeAction.lower() == "remove":
+                            await member.voice.channel.set_permissions(user, overwrite=None)
+                            embed = discord.Embed(title = "Permit Setup", description = f"{user.mention}'s access has been removed from this channel!", color = discord.Colour.blurple())
+                            return await ctx.send(embed = embed)
 
+                        elif typeAction == "=" or typeAction.lower() == "list":
+                            ch = member.voice.channel
+                            randomlist = []
+                            for x in ch.overwrites:
+                                if isinstance(x, discord.Member):
+                                    randomlist.append(x.display_name)
+
+                            formatVer = "\n".join(randomlist)
+                            
+                            embed = discord.Embed(title = "Permit List", description = f"**Users Authorized:**\n\n{formatVer}", color = discord.Color.gold())
+                            await ctx.send(embed = embed)
+                        
+                        else:
+                            return await ctx.send("Invalid Operation Type")
 
                 else:
                     try:
@@ -393,7 +413,7 @@ class SkeletonCMD(commands.Cog):
         timestamp2 = datetime.now()
         MT = discord.utils.get(ctx.guild.roles, name='Moderation Team')
         MAT = discord.utils.get(ctx.guild.roles, name='Marketing Team')
-        TT = discord.utils.get(ctx.guild.roles, name='Tech Team')
+        TT = discord.utils.get(ctx.guild.roles, name='Technical Team')
         AT = discord.utils.get(ctx.guild.roles, name='Academics Team')
         VP = discord.utils.get(ctx.guild.roles, name='VP')
         CO = discord.utils.get(ctx.guild.roles, name='CO')
@@ -449,6 +469,45 @@ class SkeletonCMD(commands.Cog):
                 embed = discord.Embed(title = "Unknown Channel", description = f"You are not the owner of this voice channel nor is this a valid channel. Please execute the command under a channel you own!", color = discord.Colour.red())
                         
 
+    @commands.command()
+    async def disconnect(self, ctx, user: discord.Member):
+        database.db.connect(reuse_if_open=True)
+        member = ctx.guild.get_member(ctx.author.id)
+        timestamp2 = datetime.now()
+
+        voice_state = member.voice
+
+        if voice_state == None:
+            embed = discord.Embed(title = "Unknown Voice Channel", description = "You have to be in a voice channel you own in order to use this!", color = discord.Colour.dark_red())
+            return await ctx.send(embed = embed)
+
+        else:
+            if voice_state.channel.id in presetChannels:
+                embed = discord.Embed(title = "UnAuthorized Channel Modification", description = "You are not allowed to modify these channels!\n\n**Error Detection:**\n**1)** Detected Static Channels", color = discord.Colour.dark_red())
+                return await ctx.send(embed = embed)
+
+            if member.voice.channel.category_id == categoryID:
+                query = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == voice_state.channel.id))
+
+                if query.exists():
+                    await user.move_to(None)
+                    embed = discord.Embed(title = "Disconnected User", description = f"Disconnected {user.mention}!", color = discord.Colour.green())
+                    return await ctx.send(embed = embed)
+
+
+                else:
+                    try:
+                        q = database.VCChannelInfo.select().where(database.VCChannelInfo.ChannelID == voice_state.channel.id).get()
+                    except:
+                        embed = discord.Embed(title = "Ownership Check Failed", description = f"This isn't a tutoring channel! Please use the command on an actual tutoring channel!", color = discord.Colour.red())
+                    else:
+                        embed = discord.Embed(title = "Ownership Check Failed", description = f"You are not the owner of this voice channel, please ask the original owner <@{q.authorID}>, to end it!", color = discord.Colour.red())
+                    finally:
+                        await ctx.send(embed = embed)
+            else:
+                embed = discord.Embed(title = "Unknown Channel", description = f"You are not the owner of this voice channel nor is this a valid channel. Please execute the command under a channel you own!", color = discord.Colour.red())
+                        
+                await ctx.send(embed = embed)
 
 
     @commands.command()
