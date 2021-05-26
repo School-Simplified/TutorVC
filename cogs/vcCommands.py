@@ -248,9 +248,9 @@ class SkeletonCMD(commands.Cog):
                 query = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == voice_state.channel.id))
 
                 if query.exists():
-                    query = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == voice_state.channel.id)).get()
-                    query.lockStatus = "True"
-                    query.save()
+                    LOCK : database.VCChannelInfo = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == voice_state.channel.id)).get()
+                    LOCK.lockStatus = "True"
+                    LOCK.save()
 
                     await member.voice.channel.set_permissions(BOT, connect = True, manage_channels = True, manage_permissions = True)
                     await member.voice.channel.set_permissions(OWNER, connect = True, manage_channels = True, manage_permissions = True)
@@ -308,9 +308,9 @@ class SkeletonCMD(commands.Cog):
                 query = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == voice_state.channel.id))
 
                 if query.exists():
-                    query = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == voice_state.channel.id)).get()
-                    query.lockStatus = "False"
-                    query.save()
+                    LOCK : database.VCChannelInfo = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == voice_state.channel.id)).get()
+                    LOCK.lockStatus = "False"
+                    LOCK.save()
 
                     await member.voice.channel.edit(sync_permissions=True)
 
@@ -337,7 +337,7 @@ class SkeletonCMD(commands.Cog):
 
 
     @commands.command()
-    async def permit(self, ctx, typeAction, user: discord.Member):
+    async def permit(self, ctx, typeAction, user: discord.Member = None):
         database.db.connect(reuse_if_open=True)
         member = ctx.guild.get_member(ctx.author.id)
         timestamp2 = datetime.now()
@@ -365,11 +365,15 @@ class SkeletonCMD(commands.Cog):
 
                     else:
                         if typeAction == "+" or typeAction.lower() == "add":
+                            if user == None:
+                                return await ctx.send("Invalid User Provided...")
                             await member.voice.channel.set_permissions(user, connect = True)
                             embed = discord.Embed(title = "Permit Setup", description = f"{user.mention} now has access to this channel!", color = discord.Colour.blurple())
                             return await ctx.send(embed = embed)
                             
                         elif typeAction == "-" or typeAction.lower() == "remove":
+                            if user == None:
+                                return await ctx.send("Invalid User Provided...")
                             await member.voice.channel.set_permissions(user, overwrite=None)
                             embed = discord.Embed(title = "Permit Setup", description = f"{user.mention}'s access has been removed from this channel!", color = discord.Colour.blurple())
                             return await ctx.send(embed = embed)
@@ -438,6 +442,9 @@ class SkeletonCMD(commands.Cog):
                     except:
                         return await ctx.send("Not a valid number!")
                     else:
+                        if voiceLIMIT == 0:
+                            return await ctx.send("Sorry, you can't set your voice channel to `0`!")
+                            
                         if MT not in ctx.author.roles and MAT not in ctx.author.roles and TT not in ctx.author.roles and AT not in ctx.author.roles and VP not in ctx.author.roles and CO not in ctx.author.roles and ctx.author.id != 682715516456140838:
                             if voiceLIMIT > 4:
                                 return await ctx.send("You can't increase the voice limit to something bigger then 4 members!")

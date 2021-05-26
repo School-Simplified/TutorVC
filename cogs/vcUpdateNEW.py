@@ -160,7 +160,7 @@ class SkeletonCMD(commands.Cog):
 
                 if team not in member.roles and SB not in member.roles and legend not in member.roles:
                     embed = discord.Embed(title = "Tutoring Voice Channel Creation", description = f"✅ *Created: {member.display_name}'s Tutoring Channel*", color = discord.Colour.green())
-                    embed.add_field(name = "Voice Channel Commands", value = "**Avaliable Voice Commands:**\n\n**1)** End - `Ends your current tutoring session.`\n**2)** ~~ReName - `Renames your voice channel to something else.`~~\n* > ReName is not available to you.\n**3)** VoiceLimit - `Changes the voice limit of your voice channel.`\n**4)** Lock - `Lock's the voice channel.`\n**5)** Unlock - `Unlocks the voice channel.`\n**6)** Permit - `Allows you to modify authorized users who can join your voice channel.`")
+                    embed.add_field(name = "Voice Channel Commands", value = "**Avaliable Voice Commands:**\n\n**1)** End - `Ends your current tutoring session.`\n**2)** ~~ReName - `Renames your voice channel to something else.`~~\n *> ⚠️ ReName is not available to you.*\n**3)** VoiceLimit - `Changes the voice limit of your voice channel.`\n**4)** Lock - `Lock's the voice channel.`\n**5)** Unlock - `Unlocks the voice channel.`\n**6)** Permit - `Allows you to modify authorized users who can join your voice channel.`")
                     embed.set_footer(text = "If you have any questions, consult the help command! | +help")
 
                 else:
