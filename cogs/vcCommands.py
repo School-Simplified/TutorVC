@@ -124,49 +124,67 @@ class SkeletonCMD(commands.Cog):
         timestamp2 = datetime.now()
 
         voice_state = member.voice
-
         if voice_state == None:
 
-            embed = discord.Embed(title = "Unknown Voice Channel", description = "You have to be in a voice channel you own in order to use this!", color = discord.Colour.dark_red())
+            query = database.VCChannelInfo.select().where(database.VCChannelInfo.authorID == ctx.author.id)
+            if query.exists():
+                query = database.VCChannelInfo.select().where(database.VCChannelInfo.authorID == ctx.author.id).get()
+
+                day = showTotalMinutes(query.datetimeObj)
+                print(query.ChannelID)
+
+                channel = await self.bot.fetch_channel(int(query.ChannelID))
+
+                await channel.delete()
+                embed = discord.Embed(title = "Ended Session", description = "I have successfully ended the session!", color = discord.Colour.blue())
+                embed.add_field(name = "Time Spent", value = f"{member.mention} you have spent a total of `{day} minutes` in voice channel, **{query.name}**.")
+                await ctx.send(embed = embed)
+
+                query.delete_instance()
+                return
+
+            else:
+                print("Ignore VC Leave")
+
+
+        if voice_state.channel.id in presetChannels:
+            embed = discord.Embed(title = "UnAuthorized Channel Deletion", description = "You are not allowed to delete these channels!\n\n**Error Detection:**\n**1)** Detected Static Channels", color = discord.Colour.dark_red())
             return await ctx.send(embed = embed)
 
-        else:
-            if voice_state.channel.id in presetChannels:
-                embed = discord.Embed(title = "UnAuthorized Channel Deletion", description = "You are not allowed to delete these channels!\n\n**Error Detection:**\n**1)** Detected Static Channels", color = discord.Colour.dark_red())
-                return await ctx.send(embed = embed)
+        if member.voice.channel.category_id == categoryID:
+            query = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == voice_state.channel.id))
 
-            if member.voice.channel.category_id == categoryID:
-                query = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == voice_state.channel.id))
+            if query.exists():
+                q: database.VCChannelInfo = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == voice_state.channel.id)).get()
+                
+                tag: database.IgnoreThis = database.IgnoreThis.create(channelID = voice_state.channel.id, authorID = member.id)
+                tag.save()
 
-                if query.exists():
-                    q: database.VCChannelInfo = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == voice_state.channel.id)).get()
-                    
-                    tag: database.IgnoreThis = database.IgnoreThis.create(channelID = voice_state.channel.id, authorID = member.id)
-                    tag.save()
+                day = showTotalMinutes(q.datetimeObj)
 
-                    day = showTotalMinutes(q.datetimeObj)
+                print("In VC")   
+                await voice_state.channel.delete()
 
-                    await voice_state.channel.delete()
-                    embed = discord.Embed(title = "Ended Session", description = "I have successfully ended the session!", color = discord.Colour.blue())
-                    embed.add_field(name = "Time Spent", value = f"{member.mention} you have spent a total of `{day} minutes` in voice channel, **{q.name}**.")
-                    await ctx.send(embed = embed)
-
-                    q.delete_instance()
-
-
-                else:
-                    try:
-                        q = database.VCChannelInfo.select().where(database.VCChannelInfo.ChannelID == voice_state.channel.id).get()
-                    except:
-                        embed = discord.Embed(title = "Ownership Check Failed", description = f"This isn't a tutoring channel! Please use the command on an actual tutoring channel!", color = discord.Colour.red())
-                    else:
-                        embed = discord.Embed(title = "Ownership Check Failed", description = f"You are not the owner of this voice channel, please ask the original owner <@{q.authorID}>, to end it!", color = discord.Colour.red())
-                    finally:
-                        await ctx.send(embed = embed)
-            else:
-                embed = discord.Embed(title = "Unknown Channel", description = f"You are not the owner of this voice channel nor is this a valid channel. Please execute the command under a channel you own!", color = discord.Colour.red())
-                        
+                embed = discord.Embed(title = "Ended Session", description = "I have successfully ended the session!", color = discord.Colour.blue())
+                embed.add_field(name = "Time Spent", value = f"{member.mention} you have spent a total of `{day} minutes` in voice channel, **{q.name}**.")
                 await ctx.send(embed = embed)
+
+                q.delete_instance()
+
+
+            else:
+                try:
+                    q = database.VCChannelInfo.select().where(database.VCChannelInfo.ChannelID == voice_state.channel.id).get()
+                except:
+                    embed = discord.Embed(title = "Ownership Check Failed", description = f"This isn't a tutoring channel! Please use the command on an actual tutoring channel!", color = discord.Colour.red())
+                else:
+                    embed = discord.Embed(title = "Ownership Check Failed", description = f"You are not the owner of this voice channel, please ask the original owner <@{q.authorID}>, to end it!", color = discord.Colour.red())
+                finally:
+                    await ctx.send(embed = embed)
+        else:
+            embed = discord.Embed(title = "Unknown Channel", description = f"You are not the owner of this voice channel nor is this a valid channel. Please execute the command under a channel you own!", color = discord.Colour.red())
+                    
+            await ctx.send(embed = embed)
         database.db.close()
 
     @commands.command()
@@ -249,7 +267,7 @@ class SkeletonCMD(commands.Cog):
 
                 if query.exists():
                     LOCK : database.VCChannelInfo = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == voice_state.channel.id)).get()
-                    LOCK.lockStatus = "True"
+                    LOCK.lockStatus = "1"
                     LOCK.save()
 
                     await member.voice.channel.set_permissions(BOT, connect = True, manage_channels = True, manage_permissions = True)
@@ -309,8 +327,11 @@ class SkeletonCMD(commands.Cog):
 
                 if query.exists():
                     LOCK : database.VCChannelInfo = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == voice_state.channel.id)).get()
-                    LOCK.lockStatus = "False"
+                    LOCK.lockStatus = "0"
                     LOCK.save()
+
+                    query = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == voice_state.channel.id)).get()
+                    print(query.lockStatus)
 
                     await member.voice.channel.edit(sync_permissions=True)
 
@@ -358,8 +379,9 @@ class SkeletonCMD(commands.Cog):
 
                 if query.exists():
                     query = database.VCChannelInfo.select().where((database.VCChannelInfo.authorID == ctx.author.id) & (database.VCChannelInfo.ChannelID == voice_state.channel.id)).get()
-                    
-                    if query.lockStatus == "False":
+                    print(query.lockStatus)
+
+                    if query.lockStatus == "0":
                         embed = discord.Embed(title = "Invalid Setup", description = "Hey there! This voice channel is already open to the public, if you want to limit its access to certain people. Then consider using `+lock` and then come back this command!", color = discord.Colour.blurple())
                         return await ctx.send(embed = embed)
 
@@ -374,6 +396,10 @@ class SkeletonCMD(commands.Cog):
                         elif typeAction == "-" or typeAction.lower() == "remove":
                             if user == None:
                                 return await ctx.send("Invalid User Provided...")
+
+                            if user.id == int(query.authorID):
+                                return await ctx.send("You can't modify your own access!")
+
                             await member.voice.channel.set_permissions(user, overwrite=None)
                             embed = discord.Embed(title = "Permit Setup", description = f"{user.mention}'s access has been removed from this channel!", color = discord.Colour.blurple())
                             return await ctx.send(embed = embed)
@@ -444,6 +470,9 @@ class SkeletonCMD(commands.Cog):
                     else:
                         if voiceLIMIT == 0:
                             return await ctx.send("Sorry, you can't set your voice channel to `0`!")
+
+                        if voiceLIMIT < 0:
+                            return await ctx.send("Sorry, you can't set your voice channel to something below `-1`!")
                             
                         if MT not in ctx.author.roles and MAT not in ctx.author.roles and TT not in ctx.author.roles and AT not in ctx.author.roles and VP not in ctx.author.roles and CO not in ctx.author.roles and ctx.author.id != 682715516456140838:
                             if voiceLIMIT > 4:

@@ -169,7 +169,7 @@ class SkeletonCMD(commands.Cog):
                     embed.set_footer(text = "If you have any questions, consult the help command! | +help")
 
                 channel = await category.create_voice_channel(f"{member.display_name}'s Tutoring Channel", user_limit = 2)
-                tag: database.VCChannelInfo = database.VCChannelInfo.create(ChannelID = channel.id, name = f"{member.display_name}'s Tutoring Channel", authorID = member.id, used = True, datetimeObj = datetime.now(), lockStatus = "False")
+                tag: database.VCChannelInfo = database.VCChannelInfo.create(ChannelID = channel.id, name = f"{member.display_name}'s Tutoring Channel", authorID = member.id, used = True, datetimeObj = datetime.now(), lockStatus = "0")
                 tag.save()
 
                 voice_client: discord.VoiceClient = discord.utils.get(self.bot.voice_clients, guild= member.guild)
